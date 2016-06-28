@@ -1,43 +1,15 @@
 package git.frank;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.apache.log4j.Logger;
 
-import git.frank.issues.Issues;
+import action.AMStatIssuesAction;
+import action.CreateLabelAction;
+import action.PMStatIssuesAction;
 
 public class Main {
 	
-	
-	private final static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-	
-	private final static String PATH;
-	
+	// Log日志
 	private final static Logger log = Logger.getLogger(Main.class);
-	
-	static{
-
-		String _path = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-		
-		System.out.println(_path);
-		
-		PATH = _path.substring(0,_path.lastIndexOf("/"));
-		
-		//PropertyConfigurator.configure("/log4j.properties");
-	}
-	
-//	public static void main(String[] args) {
-//		log.info("info");
-//		log.error("error");
-//	}
 	
 	public static void main(String[] args) {
 		
@@ -54,76 +26,15 @@ public class Main {
 		
 		log.info("login=" + login + "|password=" + password + "|repository=" + repository + "|option=" + option);
 		
-		//jar 包所在路径
-		String path = PATH;
-		
 		switch (option) {
 		case "AMStatIssues":
-			try {
-				Issues issues = new Issues(login, password, repository);
-				String result = issues.aMStatIssues();
-
-				log.info(result);
-				
-				String title = "Issues早报--" + simpleDateFormat.format(new Date());
-				int issuesNum = issues.createIssues(title,result);
-				
-				path = path + File.separatorChar + repository.replace("/", "_") + "AMIssuesNum";
-				File file = new File(path);
-				if (!file.exists()) {
-					log.info("文件不存在，创建文件：" + path);
-					file.createNewFile();
-				}
-				
-				FileOutputStream out = new FileOutputStream(file);
-				out.write((issuesNum+"").getBytes());
-				out.close();
-				
-				log.info("issues编号：#" + issuesNum);
-				
-				System.exit(0);
-			} catch (IOException e) {
-				log.error("创建早报issues失败！异常信息：" + e.getMessage());
-				System.exit(-1);
-			}
+			AMStatIssuesAction.run(login, password, repository);
 			break;
 		case "PMStatIssues":
-			try {
-				Issues issues = new Issues(login, password, repository);
-				path = path + File.separatorChar + repository.replace("/", "_") + "AMIssuesNum";
-				File file = new File(path);
-				if (!file.exists()) {
-					log.error("早报Issues Num文件丢失，无法正常读取！");
-					System.exit(-1);
-				}
-				
-				//读取早报Issues Num保存文件
-				InputStream in = new FileInputStream(file);
-				InputStreamReader read = new InputStreamReader(in);
-				BufferedReader bufferedReader = new BufferedReader(read);
-				String lineText = bufferedReader.readLine();
-				bufferedReader.close();
-				read.close();
-				if (lineText == null || lineText == "") {
-					log.error("早报Issues Num文件读取失败，无法正常读取Issues Num！");
-					System.exit(-1);
-				}
-				
-				int issuesNumber = Integer.parseInt(lineText);
-				//晚报 issues 统计
-				String  result = issues.pMStatIssues(issuesNumber);
-				//创建issues评论
-				issues.createCommentByIssuesNumber(issuesNumber, result);
-				log.info(result);
-				System.exit(0);
-			} catch (IOException e) {
-				log.error("创建晚报issues失败！异常信息：" + e.getMessage());
-				System.exit(-1);
-			}
-			System.exit(0);
+			PMStatIssuesAction.run(login, password, repository);
 			break;
-		case "buildWiki":
-			
+		case "CreateLabel":
+			CreateLabelAction.run(login, password, repository);
 			break;
 		default:
 			System.out.println("没有找到对应的操作，请使用 -help 选项查看帮助信息");
@@ -168,7 +79,13 @@ public class Main {
 		buffer.append("[选项]可选值：\n");
 		buffer.append("\tAMStatIssues\n");
 		buffer.append("\tPMStatIssues\n");
-		//buffer.append("\tbuildWiki\n");
+		buffer.append("\tCreateLabel\n");
+		buffer.append("[选项]说明：\n");
+		buffer.append("\tAMStatIssues：（无）\n");
+		buffer.append("\tPMStatIssues：（无）\n");
+		buffer.append("\tCreateLabel：在根目录创建“lables.txt”文件，内容为标签描述信息，每一行为一个标签，格式为“[标签名]#[颜色16进制值]#[选项]”\n");
+		buffer.append("\t\t选项可选值\n");
+		buffer.append("\t\t1.del\t“del：删除当前标签”，例：“已完成#00ff00”或“已完成#00ff00#del”\n");
 		buffer.append("=============================================\n");
 		
 		System.out.println(buffer);
