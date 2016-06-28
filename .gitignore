@@ -2,3 +2,7 @@
 /target/
 /.project
 /.settings
+/debug.log
+/error.log
+/fatal.log
+/info.log
