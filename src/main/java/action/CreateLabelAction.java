@@ -9,11 +9,15 @@ import org.apache.log4j.Logger;
 import git.frank.issues.Label;
 import utils.FileUtils;
 
-public class CreateLabelAction {
+public class CreateLabelAction extends Action {
 	
-	private static Logger log = Logger.getLogger(CreateLabelAction.class);
+	private Logger log = Logger.getLogger(CreateLabelAction.class);
 	
-	public static void run(String login, String password, String repository) {
+	public CreateLabelAction(String login, String password, String repository) {
+		super(login, password, repository);
+	}
+	
+	public void run() {
 		try {
 			// 实例化 Label 对象
 			Label label = new Label(login, password, repository);

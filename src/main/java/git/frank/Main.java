@@ -3,6 +3,7 @@ package git.frank;
 import org.apache.log4j.Logger;
 
 import action.AMStatIssuesAction;
+import action.Action;
 import action.CreateLabelAction;
 import action.PMStatIssuesAction;
 
@@ -26,21 +27,26 @@ public class Main {
 		
 		log.info("login=" + login + "|password=" + password + "|repository=" + repository + "|option=" + option);
 		
+		Action action = null;
+		
 		switch (option) {
 		case "AMStatIssues":
-			AMStatIssuesAction.run(login, password, repository);
+			action = new AMStatIssuesAction(login, password, repository);
 			break;
 		case "PMStatIssues":
-			PMStatIssuesAction.run(login, password, repository);
+			action = new PMStatIssuesAction(login, password, repository);
 			break;
 		case "CreateLabel":
-			CreateLabelAction.run(login, password, repository);
+			action = new CreateLabelAction(login, password, repository);
 			break;
 		default:
 			System.out.println("没有找到对应的操作，请使用 -help 选项查看帮助信息");
 			break;
 		}
 		
+		action.run();
+		
+		System.exit(0);
 	}
 	
 	

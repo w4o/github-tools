@@ -10,15 +10,19 @@ import org.apache.log4j.Logger;
 import git.frank.issues.Issues;
 import utils.FileUtils;
 
-public class AMStatIssuesAction {
-
-	private static Logger log = Logger.getLogger(AMStatIssuesAction.class);
+public class AMStatIssuesAction extends Action {
 	
-	public static void run(String login, String password, String repository) {
-		try {
+	private Logger log = Logger.getLogger(AMStatIssuesAction.class);
+	
+	public AMStatIssuesAction(String login, String password, String repository) {
+		super(login, password, repository);
+	}
+	
+	public void run() {
 		
+		try {
 			// 实例化 Issues
-			Issues issues = new Issues(login, password, repository);
+			Issues issues = new Issues(this.login, this.password, this.repository);
 			
 			// 早报统计
 			String result = issues.aMStatIssues();

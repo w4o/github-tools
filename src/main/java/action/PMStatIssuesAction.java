@@ -8,11 +8,15 @@ import org.apache.log4j.Logger;
 import git.frank.issues.Issues;
 import utils.FileUtils;
 
-public class PMStatIssuesAction {
+public class PMStatIssuesAction extends Action {
 
-	private static Logger log = Logger.getLogger(PMStatIssuesAction.class);
+	private Logger log = Logger.getLogger(PMStatIssuesAction.class);
 
-	public static void run(String login, String password, String repository) {
+	public PMStatIssuesAction(String login, String password, String repository) {
+		super(login, password, repository);
+	}
+
+	public void run() {
 		try {
 			// 实例化 Issues
 			Issues issues = new Issues(login, password, repository);
